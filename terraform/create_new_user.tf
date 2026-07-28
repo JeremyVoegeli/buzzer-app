@@ -40,7 +40,7 @@ resource "aws_iam_role_policy_attachment" "attach_lambda_policy_to_dynamodb" {
 #another link, attaches pre-defined AWS policy to same role
 resource "aws_iam_role_policy_attachment" "attach_lambda_logging_policy" {
     role = aws_iam_role.lambda_role.name
-    policy_arn = "arn:aws:iam::aws:policy/AWSLambdaBasicExecutionRole"
+    policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }
 
 #creates zip archive of code
@@ -56,6 +56,6 @@ resource "aws_lambda_function" "create_new_user_lambda" {
     source_code_hash = data.archive_file.create_new_user_zip.output_base64sha256
     function_name = "create_new_user"
     role = aws_iam_role.lambda_role.arn
-    runtime = "python3.14"
+    runtime = "python3.13"
     handler = "create_new_user.lambda_handler"
 }
