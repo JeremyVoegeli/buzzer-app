@@ -16,3 +16,8 @@ resource "aws_apigatewayv2_route" "create_user_route" {
     route_key = "create_user"
     target = "integrations/${aws_apigatewayv2_integration.api_integration.id}"
 }
+
+resource "aws_apigatewayv2_deployment" "websocket_api_deployment" {
+    api_id = aws_apigatewayv2_api.websocket_api.id
+    depends_on = [aws_apigatewayv2_route.create_user_route] #<- says, "don't create this resource until create_user_route is created"
+}
