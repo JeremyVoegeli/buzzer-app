@@ -66,5 +66,5 @@ resource "aws_lambda_permission" "lambda_invoke_permissions" {
     action = "lambda:InvokeFunction"
     function_name = aws_lambda_function.create_new_user_lambda.function_name
     principal = "apigateway.amazonaws.com"
-    source_arn = 
+    source_arn = "${aws_apigatewayv2_api.websocket_api.execution_arn}/*"
 }
