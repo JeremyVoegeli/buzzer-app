@@ -59,3 +59,12 @@ resource "aws_lambda_function" "create_new_user_lambda" {
     runtime = "python3.13"
     handler = "create_new_user.lambda_handler"
 }
+
+#determines who is allowed to invoke the lambda
+resource "aws_lambda_permission" "lambda_invoke_permissions" {
+    statement_id = "AllowAPIGatewayInvoke"
+    action = "lambda:InvokeFunction"
+    function_name = aws_lambda_function.create_new_user_lambda.function_name
+    principal = "apigateway.amazonaws.com"
+    source_arn = 
+}
