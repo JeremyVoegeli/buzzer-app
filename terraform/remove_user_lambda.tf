@@ -18,5 +18,5 @@ resource "aws_lambda_permission" "remove_user_invoke_permissions"{
     action = "lambda:InvokeFunction"
     function_name = aws_lambda_function.remove_user_lambda.function_name
     principal = "apigateway.amazonaws.com"
-    source_arn = "${aws_pigatewayv2_api.websocket_api.execution_arn}/*"
+    source_arn = "${aws_apigatewayv2_api.websocket_api.execution_arn}/*"
 }
