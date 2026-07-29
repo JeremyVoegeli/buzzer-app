@@ -1,4 +1,4 @@
-#creates JSON document ("Who can assume this role?")
+# ---------- Lambda Trust Document ----------
 data "aws_iam_policy_document" "lambda_trust" {
     statement {
         effect = "Allow"
@@ -8,20 +8,9 @@ data "aws_iam_policy_document" "lambda_trust" {
             identifiers = ["lambda.amazonaws.com"]
         }
     }
-}
+} #("Who can assume this role?")
 
-#actual IAM role in AWS account, plugs in policy from block above
-resource "aws_iam_role" "lambda_role" {
-    name = "lambda_role"
-    assume_role_policy = data.aws_iam_policy_document.lambda_trust.json
-}
-
-#link, attaches pre-defined AWS policy to same role
-resource "aws_iam_role_policy_attachment" "attach_lambda_logging_policy" {
-    role = aws_iam_role.lambda_role.name
-    policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-}
-
+# ---------- API Gateway Connection Policy ----------
 data "aws_iam_policy_document" "apigateway_connection_permissions" {
     statement{
         effect = "Allow"
@@ -33,9 +22,4 @@ data "aws_iam_policy_document" "apigateway_connection_permissions" {
 resource "aws_iam_policy" "apigateway_policy" {
     name = "apigateway_send_response_through_connections"
     policy = data.aws_iam_policy_document.apigateway_connection_permissions.json
-}
-
-resource "aws_iam_role_policy_attachment" "attach_lambda_policy_to_apigateway" {
-    role = aws_iam_role.lambda_role.name
-    policy_arn = aws_iam_policy.apigateway_policy.arn
 }
