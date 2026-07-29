@@ -10,7 +10,7 @@ def lambda_handler(event, context):
     client = boto3.client("apigatewaymanagementapi", endpoint_url=endpoint_url)
 
     response_data = {
-        "message": "This is a message.",
+        "message": "Created new user (test).",
         "status": "success"
     }
 
