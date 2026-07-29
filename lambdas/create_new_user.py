@@ -7,7 +7,7 @@ def lambda_handler(event, context):
     stage = event["requestContext"]["stage"]
     endpoint_url = f"https://{domain}/{stage}"
 
-    client = boto3.client("apigatewaymanagementapi", endpoinet_url=endpoint_url)
+    client = boto3.client("apigatewaymanagementapi", endpoint_url=endpoint_url)
 
     response_data = {
         "message": "This is a message.",
