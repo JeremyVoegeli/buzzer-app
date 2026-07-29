@@ -16,7 +16,7 @@ resource "aws_lambda_function" "create_new_user_lambda" {
 }
 
 #determines who is allowed to invoke the lambda
-resource "aws_lambda_permission" "lambda_invoke_permissions" {
+resource "aws_lambda_permission" "create_new_user_invoke_permissions" {
     statement_id = "AllowAPIGatewayInvoke"
     action = "lambda:InvokeFunction"
     function_name = aws_lambda_function.create_new_user_lambda.function_name
