@@ -12,32 +12,11 @@ data "aws_iam_policy_document" "lambda_trust" {
 
 #actual IAM role in AWS account, plugs in policy from block above
 resource "aws_iam_role" "lambda_role" {
-    name = "lambda_write_connected_users_db_role"
+    name = "lambda_role"
     assume_role_policy = data.aws_iam_policy_document.lambda_trust.json
 }
 
-#creates another JSON document ("What actions are allowed on what resource?")
-data "aws_iam_policy_document" "dynamodb_write_permissions" {
-    statement {
-        effect = "Allow"
-        actions = ["dynamodb:PutItem"]
-        resources = [aws_dynamodb_table.connected_users.arn]
-    }
-}
-
-#creates IAM policy out of block above
-resource "aws_iam_policy" "dynamodb_policy" {
-    name = "dynamodb_allow_lambda_writes_to_table"
-    policy = data.aws_iam_policy_document.dynamodb_write_permissions.json
-}
-
-#link, attaches policy to role
-resource "aws_iam_role_policy_attachment" "attach_lambda_policy_to_dynamodb" {
-    role = aws_iam_role.lambda_role.name
-    policy_arn = aws_iam_policy.dynamodb_policy.arn
-}
-
-#another link, attaches pre-defined AWS policy to same role
+#link, attaches pre-defined AWS policy to same role
 resource "aws_iam_role_policy_attachment" "attach_lambda_logging_policy" {
     role = aws_iam_role.lambda_role.name
     policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
