@@ -24,7 +24,7 @@ resource "aws_iam_role_policy_attachment" "dynamodb_write_policy_attachment" {
 }
 
 # ---------- CloudWatch Logging Policy ----------
-resource "aws_iam_role_policy_attachment" "attach_lambda_logging_policy" {
+resource "aws_iam_role_policy_attachment" "attach_logging_policy_to_create_new_user" {
     role = aws_iam_role.create_new_user_role.name
     policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }
