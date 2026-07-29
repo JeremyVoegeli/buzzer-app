@@ -16,7 +16,7 @@ resource "aws_iam_policy" "dynamodb_delete_policy" {
     policy = data.aws_iam_policy_document.dynamodb_delete_permissions.json
 }
 
-resource "aws_iam_policy_attachment" "dynamodb_delete_policy_attachment" {
+resource "aws_iam_role_policy_attachment" "dynamodb_delete_policy_attachment" {
     role = aws_iam_role.remove_user_role.name
     policy_arn = aws_iam_policy.dynamodb_delete_policy.arn
 }
