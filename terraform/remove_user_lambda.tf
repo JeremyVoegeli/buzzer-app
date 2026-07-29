@@ -8,7 +8,7 @@ resource "aws_lambda_function" "remove_user_lambda" {
     filename = data.archive_file.remove_user_zip.output_path
     source_code_hash = data.archive_file.remove_user_zip.output_base64sha256
     function_name = "remove_user"
-    role = aws_iam_role.lambda_role.arn
+    role = aws_iam_role.remove_user_role.arn
     runtime = "python3.13"
     handler = "remove_user.lambda_handler"
 }

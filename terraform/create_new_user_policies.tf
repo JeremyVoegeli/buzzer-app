@@ -30,7 +30,7 @@ resource "aws_iam_role_policy_attachment" "attach_logging_policy_to_create_new_u
 }
 
 # ---------- Attachment for API Gateway Policy ----------
-resource "aws_iam_role_policy_attachment" "attach_apigateway_policy_to_lambda" {
+resource "aws_iam_role_policy_attachment" "attach_apigateway_policy_to_create_new_user" {
     role = aws_iam_role.create_new_user_role.name
     policy_arn = aws_iam_policy.apigateway_policy.arn
 }

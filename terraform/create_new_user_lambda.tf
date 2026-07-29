@@ -10,7 +10,7 @@ resource "aws_lambda_function" "create_new_user_lambda" {
     filename = data.archive_file.create_new_user_zip.output_path
     source_code_hash = data.archive_file.create_new_user_zip.output_base64sha256
     function_name = "create_new_user"
-    role = aws_iam_role.lambda_role.arn
+    role = aws_iam_role.create_new_user_role.arn
     runtime = "python3.13"
     handler = "create_new_user.lambda_handler"
 }
