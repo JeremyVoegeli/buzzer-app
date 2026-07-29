@@ -37,6 +37,24 @@ resource "aws_iam_role_policy_attachment" "attach_lambda_policy_to_dynamodb" {
     policy_arn = aws_iam_policy.dynamodb_policy.arn
 }
 
+data "aws_iam_policy_document" "apigateway_connection_permissions" {
+    statement{
+        effect = "Allow"
+        actions = ["execute-api:ManageConnections"]
+        resources = ["${aws_apigatewayv2_api.websocket_api.execution_arn}/*/POST/@connections/*"] #<execution_arn>/<stage>/<http_method>/@connections/<connection_id>
+    }
+}
+
+resource "aws_iam_policy" "apigateway_policy" {
+    name = "apigateway_send_response_through_connections"
+    policy = data.aws_iam_policy_document.apigateway_connection_permissions.json
+}
+
+resource "aws_iam_role_policy_attachment" "attach_lambda_policy_to_apigateway" {
+    role = aws_iam_role.lambda_role.name
+    policy_arn = aws_iam_policy.apigateway_policy.arn
+}
+
 #another link, attaches pre-defined AWS policy to same role
 resource "aws_iam_role_policy_attachment" "attach_lambda_logging_policy" {
     role = aws_iam_role.lambda_role.name
