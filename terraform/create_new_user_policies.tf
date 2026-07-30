@@ -8,7 +8,7 @@ resource "aws_iam_role" "create_new_user_role" {
 data "aws_iam_policy_document" "dynamodb_write_permissions" {
     statement {
         effect = "Allow"
-        actions = ["dynamodb:PutItem"]
+        actions = ["dynamodb:PutItem", "dynamodb:Query"]
         resources = [aws_dynamodb_table.connected_users.arn]
     }
 }

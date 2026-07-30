@@ -37,7 +37,6 @@ def lambda_handler(event, context):
         user_id = str(uuid.uuid4())
         is_host = False
 
-
         response_data = {
             "message": "Created new user (test).",
             "status": "success"
