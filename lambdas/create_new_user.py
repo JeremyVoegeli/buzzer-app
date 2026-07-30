@@ -3,6 +3,10 @@ import uuid
 import random
 import string
 import boto3
+from boto3.dynamodb.conditions import Key
+
+dynamodb = boto3.resource("dynamodb")
+table = dynamodb.Table("connections")
 
 def lambda_handler(event, context):
     #establish variables from request
@@ -19,10 +23,21 @@ def lambda_handler(event, context):
         client.post_to_connection(ConnectionId=connection_id, Data=json.dumps(msg))
 
     #generates a 6-digit uppercase-only string to represent the room code
-    def generate_room_code():
+    def generate_room_id():
         allowed_chars = string.ascii_uppercase
-        random_code = "".join(random.choices(allowed_chars, k=6))
-        return random_code
+        random_id = "".join(random.choices(allowed_chars, k=6))
+        return random_id
+
+    #returns true if there is a collision in the room_id, false otherwise
+    def has_room_id_collision(room_id):
+        response = table.query(KeyConditionExpression=Key("room_id").eq(room_id))
+
+        items = response.get("Items", [])
+
+        if items:
+            return True
+        else:
+            return False
 
     # ---------- Actual Lambda Logic ----------
     if "body" not in event or not event["body"]: #check that request body is present
@@ -37,12 +52,48 @@ def lambda_handler(event, context):
         user_id = str(uuid.uuid4())
         is_host = False
 
-        response_data = {
-            "message": "Created new user (test).",
-            "status": "success"
-        }
+        if "room_id" in event["body"]:
+            room_id = event["body"]["room_id"]
+        else:
+            is_host = True
+            room_id = generate_room_id()
 
-        send_to_client(response_data)
+            i = 0
+            while (i < 50):
+                if not has_room_id_collision(room_id):
+                    break
+                room_id = generate_room_id()
+                i += 1
+
+            if (i == 50):
+                send_to_client({
+                    "message": "Couldn't generate room id. Please try again later.",
+                    "status": "Error"
+                })
+                return {"statusCode": 400}
+
+        response = table.put_item(
+            Item = {
+                "room_id": room_id,
+                "connection_id": connection_id,
+                "username": username,
+                "user_id": user_id,
+                "is_host": is_host
+            }
+        )
+
+        put_item_status_code = response["ResponseMetadata"]["HTTPStatusCode"]
+        if put_item_status_code != 200:
+            send_to_client({
+                "message": "Couldn't add new user to the database",
+                "status": "Error"
+            })
+            return {"statusCode": put_item_status_code}
+
+        send_to_client({
+            "message": "Created new user.",
+            "status": "success"
+        })
         return {"statusCode": 200}
     
     except json.JSONDecodeError: #error for invalid json format
