@@ -9,6 +9,7 @@ dynamodb = boto3.resource("dynamodb")
 table = dynamodb.Table("connections")
 
 def lambda_handler(event, context):
+    print(event)
     #establish variables from request
     connection_id = event["requestContext"]["connectionId"]
     domain = event["requestContext"]["domainName"]
@@ -98,7 +99,7 @@ def lambda_handler(event, context):
         })
         return {"statusCode": 200}
     
-    except json.JSONDecodeError: #error for invalid json format
+    except (json.JSONDecodeError, KeyError): #error for invalid json format
         send_to_client({
             "message": "Invalid JSON format",
             "status": "Error"
