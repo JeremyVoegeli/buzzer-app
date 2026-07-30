@@ -18,6 +18,12 @@ def lambda_handler(event, context):
     def send_to_client(msg):
         client.post_to_connection(ConnectionId=connection_id, Data=json.dumps(msg))
 
+    #generates a 6-digit uppercase-only string to represent the room code
+    def generate_room_code():
+        allowed_chars = string.ascii_uppercase
+        random_code = "".join(random.choices(allowed_chars, k=6))
+        return random_code
+
     # ---------- Actual Lambda Logic ----------
     if "body" not in event or not event["body"]: #check that request body is present
         send_to_client({
