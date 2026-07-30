@@ -48,12 +48,14 @@ def lambda_handler(event, context):
         return {"statusCode": 400}
 
     try:
-        username = event["body"]["username"]
+        body = json.loads(event["body"])
+
+        username = body["username"]
         user_id = str(uuid.uuid4())
         is_host = False
 
-        if "room_id" in event["body"]:
-            room_id = event["body"]["room_id"]
+        if "room_id" in body:
+            room_id = body["room_id"]
         else:
             is_host = True
             room_id = generate_room_id()
@@ -101,4 +103,4 @@ def lambda_handler(event, context):
             "message": "Invalid JSON format",
             "status": "Error"
         })
-        return {"StatusCode": 400}
+        return {"statusCode": 400}
