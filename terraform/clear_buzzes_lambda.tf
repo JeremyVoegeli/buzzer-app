@@ -6,7 +6,7 @@ data "archive_file" "clear_buzzes_zip" {
 
 resource "aws_lambda_function" "clear_buzzes_lambda" {
     filename = data.archive_file.clear_buzzes_zip.output_path
-    source_code_hash = data.archive_file.create_new_user_zip.output_base64sha256
+    source_code_hash = data.archive_file.clear_buzzes_zip.output_base64sha256
     function_name = "clear_buzzes"
     role = aws_iam_role.clear_buzzes_role.arn
     runtime = "python3.13"
