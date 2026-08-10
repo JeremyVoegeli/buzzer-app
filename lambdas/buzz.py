@@ -39,7 +39,7 @@ def lambda_handler(event, context):
             return True
 
         for buzz in buzzes:
-            if buzz["buzz_time"].fromisoformat() < cur_buzz.fromisoformat():
+            if datetime.fromisoformat(buzz["buzz_time"]) < datetime.fromisoformat(cur_buzz):
                 return False
 
         return True
@@ -50,7 +50,7 @@ def lambda_handler(event, context):
     body = json.loads(event["body"])
     room_id = body["room_id"]
     user_id = body["user_id"]
-    buzz_time = datetime.now(timezone.utc)
+    buzz_time = str(datetime.now(timezone.utc))
     put_response = buzzes_table.put_item(
         Item = {
             "room_id": room_id,
