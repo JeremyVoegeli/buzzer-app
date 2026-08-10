@@ -76,7 +76,7 @@ def lambda_handler(event, context):
         send_to_client({
             "message": "You buzzed first in the room.",
             "status": "success"
-        })
+        }, connection_id)
 
         return {"statusCode": 200}
 
