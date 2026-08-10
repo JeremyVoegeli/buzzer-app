@@ -1,5 +1,6 @@
 import json
 import boto3
+from boto3.dynamodb.conditions import Key
 
 """
 Expected Request Format:
@@ -47,6 +48,16 @@ def lambda_handler(event, context):
         })
         return {"statusCode": 404}
 
-    print(items)
+    #delete the user from the db based on their room_id
+    for item in items:
+        room_id = item["room_id"]
+        table.delete_item(Key={
+            "room_id": room_id,
+            "connection_id": connection_id_to_remove
+        })
 
+    send_to_client({
+        "message": f"removed user: {items}",
+        "status": "success"
+    })
     return {"statusCode": 200}
