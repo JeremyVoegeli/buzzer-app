@@ -15,7 +15,7 @@ table = dynamodb.Table("connections")
 
 def lambda_handler(event, context):
     # ---------- Lambda Logistics ----------
-    print(event)
+    print("event: ", event)
 
     #establish variables from request
     connection_id = event["requestContext"]["connectionId"]
