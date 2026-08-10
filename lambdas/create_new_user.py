@@ -5,11 +5,22 @@ import string
 import boto3
 from boto3.dynamodb.conditions import Key
 
+"""
+Expected Request format:
+{
+    "action": "create_user",
+    "username": "John Doe",
+    "room_id": "ABCDE"
+}
+"""
+
 dynamodb = boto3.resource("dynamodb")
 table = dynamodb.Table("connections")
 
 def lambda_handler(event, context):
+    # ---------- Lambda Logistics ----------
     print(event)
+
     #establish variables from request
     connection_id = event["requestContext"]["connectionId"]
     domain = event["requestContext"]["domainName"]

@@ -1,22 +1,52 @@
 import json
 import boto3
 
+"""
+Expected Request Format:
+{
+    "action": "remove_user",
+    "connection_id: gVuFMK6MpQAYKEjXpA==
+}
+"""
+
+dynamodb = boto3.resource("dynamodb")
+table = dynamodb.Table("connections")
+
 def lambda_handler(event, context):
+    # ---------- Lambda Logistics ----------
+    print(event)
+
+    #establish variables from request
     connection_id = event["requestContext"]["connectionId"]
     domain = event["requestContext"]["domainName"]
     stage = event["requestContext"]["stage"]
     endpoint_url = f"https://{domain}/{stage}"
 
+    #establish connection to the client
     client = boto3.client("apigatewaymanagementapi", endpoint_url=endpoint_url)
 
-    response_data = {
-        "message": "Successfully removed user. (test)",
-        "status": "success"
-    }
+    #sends msg (JSON) back to client
+    def send_to_client(msg):
+        client.post_to_connection(ConnectionId=connection_id, Data=json.dumps(msg))
 
-    client.post_to_connection(
-        ConnectionId=connection_id,
-        Data=json.dumps(response_data)
-    )
+    # ---------- Actual Lambda Logic ----------
+
+    #retrieve connection_id from request
+    body = json.loads(event["body"])
+    connection_id_to_remove = body["connection_id"]
+
+    #query for room_id of user
+    query_response = table.query(IndexName="index_by_connection_id", KeyConditionExpression=Key("connection_id").eq(connection_id_to_remove))
+    items = query_response.get("Items", [])
+
+    #check that user exists in db
+    if not items:
+        send_to_client({
+            "message": "User isn't currently in database",
+            "status": "Error"
+        })
+        return {"statusCode": 404}
+
+    print(items)
 
     return {"statusCode": 200}
