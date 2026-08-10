@@ -10,7 +10,7 @@ Expected Request format:
 {
     "action": "create_user",
     "username": "John Doe",
-    "room_id": "ABCDE"
+    "room_id": "ABCDE" (<- optional)
 }
 """
 
