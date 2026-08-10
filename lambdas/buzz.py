@@ -33,17 +33,6 @@ def lambda_handler(event, context):
     def send_to_client(msg, c_id):
         client.post_to_connection(ConnectionId=c_id, Data=json.dumps(msg))
 
-    #returns true if this buzz was first in the buzzes table (requires a list of all dynamodb buzz items, and the current buzz time)
-    def was_first_buzz(buzzes, cur_buzz: str):
-        if (not buzzes):
-            return True
-
-        for buzz in buzzes:
-            if datetime.fromisoformat(buzz["buzz_time"]) < datetime.fromisoformat(cur_buzz):
-                return False
-
-        return True
-
     # ---------- Actual Lambda Logic ----------
 
     #add buzz item into "buzzes" table
@@ -60,10 +49,14 @@ def lambda_handler(event, context):
     )
 
     #check if the buzz was first in the room
-    query_response = buzzes_table.query(KeyConditionExpression=Key("room_id").eq(room_id))
+    query_response = buzzes_table.query(
+        KeyConditionExpression=Key("room_id").eq(room_id),
+        ScanIndexForward=True,
+        Limit=1
+        )
+    
     items = query_response.get("Items", [])
-
-    if was_first_buzz(items, buzz_time):
+    if items[0]["user_id"] == user_id:
         #get a list of all connection_ids in the current room
         query_response2 = connections_table.query(KeyConditionExpression=Key("room_id").eq(room_id))
         items2 = query_response2.get("Items", [])
