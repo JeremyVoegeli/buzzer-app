@@ -106,6 +106,7 @@ def lambda_handler(event, context):
 
         send_to_client({
             "message": "Created new user.",
+            "user_id": user_id,
             "status": "success"
         })
         return {"statusCode": 200}
