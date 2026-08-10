@@ -64,7 +64,7 @@ def lambda_handler(event, context):
             })
             return {"statusCode": 404}
 
-        with table.batch_writer as batch:
+        with table.batch_writer() as batch:
              for item in items:
                   batch.delete_item(
                        Key={
