@@ -111,16 +111,14 @@ Fires automatically when a socket closes (tab closed, network drop, etc.) — sa
 ```
 
 ### Response — To the winner (first buzz)
-> TODO: current code sends losers' message unconditionally due to a bug being fixed — confirm final shape. Target:
 ```json
 { "message": "You buzzed first!", "status": "success" }
 ```
 
 ### Response — Broadcast to other room members (when someone wins)
 ```json
-{ "message": "a1a4dc35-c81b-4d35-8aca-0600a9f95e02 buzzed first", "status": "success" }
+{ "message": "John buzzed first", "status": "success" }
 ```
-> Consider sending `username` instead of/alongside raw `user_id` for frontend display purposes.
 
 ### Response — To a non-winning buzzer
 ```json

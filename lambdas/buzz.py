@@ -33,6 +33,14 @@ def lambda_handler(event, context):
     def send_to_client(msg, c_id):
         client.post_to_connection(ConnectionId=c_id, Data=json.dumps(msg))
 
+    #checks whether a connection with given connection_id is open
+    def is_connection_open(connection_id):
+         try:
+              client.get_connection(ConnectionId=connection_id)
+              return True
+         except client.exceptions.GoneException:
+              return False
+
     # ---------- Actual Lambda Logic ----------
     if "body" not in event or not event["body"]: #check that request body is present
             send_to_client({
