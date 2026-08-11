@@ -77,12 +77,14 @@ def lambda_handler(event, context):
 
             connection_ids = []
             for connection in items2:
-                #removes user if there is a closed connection
+                #removes user if there is a closed connection - fallback for any stale connections left over
                 if not is_connection_open(connection["connection_id"]):
-                    
+                    response = connections_table.delete_item(Key={"room_id": room_id, "connection_id": connection["connection_id"]})
                     print(f"Removed {connection["user_id"]}")
+
                 elif (connection["connection_id"] != connection_id):
                     connection_ids.append(connection["connection_id"])
+
                 else:
                      winning_username = connection["username"]
 
