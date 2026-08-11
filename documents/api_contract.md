@@ -101,7 +101,7 @@ Fires automatically when a socket closes (tab closed, network drop, etc.) — sa
 
 ## 3. `buzz`
 
-### Request
+### Request - Success
 ```json
 {
   "action": "buzz",
@@ -125,9 +125,6 @@ Fires automatically when a socket closes (tab closed, network drop, etc.) — sa
 { "message": "You didn't buzz first in the room.", "status": "success" }
 ```
 
-### Known behavior
-- Stale/disconnected connections encountered during broadcast (`GoneException`) are now handled without crashing the whole invocation — confirm whether stale rows also get cleaned up from `connections`, or just skipped.
-
 ---
 
 ## 4. `clear_buzzes`
@@ -140,8 +137,31 @@ Fires automatically when a socket closes (tab closed, network drop, etc.) — sa
 }
 ```
 
-### Response
-> TODO: confirm final response shape — likely an ack, possibly broadcast to all room members that the buzzer has been reset.
+### Request - Success
+```json
+{
+    "message": "Successfully cleared all buzzes for room <room_id>.",
+    "status": "success"
+}
+```
+
+### Response — Error (missing body)
+```json
+{ "message": "Missing request body", "status": "Error" }
+```
+
+### Response — Error (invalid JSON)
+```json
+{ "message": "Invalid JSON format", "status": "Error" }
+```
+
+### Response - Error (no buzzes were found)
+```json
+{
+    "message": "No buzzes were found.",
+    "status": "Error"
+}
+```
 
 ---
 
@@ -149,10 +169,3 @@ Fires automatically when a socket closes (tab closed, network drop, etc.) — sa
 See **`leave_room`** above — shares the same cleanup Lambda. No client-sent body; `connectionId` from `requestContext` is the only input.
 
 ---
-
-## Open items to resolve before/while building frontend
-- [ ] Add `room_id`, `user_id`, `is_host` to `create_user`'s success response
-- [ ] Finalize and confirm `buzz`'s winner-vs-loser response logic (the unconditional trailing message bug)
-- [ ] Confirm `leave_room` and `clear_buzzes` response shapes once their Lambda logic is finalized
-- [ ] Decide whether `buzz` broadcasts should include `username`, not just `user_id`
-- [ ] Decide whether `connections` table needs cleanup logic for `GoneException`-detected stale rows during `buzz` broadcasts
