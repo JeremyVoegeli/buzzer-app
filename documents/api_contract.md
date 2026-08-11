@@ -61,12 +61,12 @@ Handles both room creation and room joining — distinguished by whether `room_i
 
 ---
 
-## 2. `leave_room` (custom action, shares Lambda with `$disconnect`)
+## 2. `remove_user` (custom action, shares Lambda with `$disconnect`)
 
 ### Request
 ```json
 {
-  "action": "leave_room"
+  "action": "remove_user"
 }
 ```
 No body fields needed — the Lambda derives `room_id` from the caller's `connectionId` via the `index_by_connection_id` GSI on `connections`.
@@ -74,8 +74,28 @@ No body fields needed — the Lambda derives `room_id` from the caller's `connec
 ### Also triggered by: `$disconnect`
 Fires automatically when a socket closes (tab closed, network drop, etc.) — same underlying cleanup logic, no client message involved.
 
-### Response
-> Confirm current shape once finalized — likely a simple ack to the leaving client, and/or a broadcast to remaining room members that someone left.
+### Response — Success
+```json
+{
+  "message": "removed user: <user_id>",
+  "status": "success"
+}
+```
+
+### Response — Error (missing body)
+```json
+{ "message": "Missing request body", "status": "Error" }
+```
+
+### Response — Error (invalid JSON)
+```json
+{ "message": "Invalid JSON format", "status": "Error" }
+```
+
+### Response - Error (user not found)
+```json
+{"message": "User isn't currently in database", "status": "Error"}
+```
 
 ---
 
