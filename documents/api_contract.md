@@ -1,9 +1,10 @@
 # Buzzer App — WebSocket API Contract
-
+ 
 Base connection: `wss://<api-id>.execute-api.<region>.amazonaws.com/prod`
-
+> Real value lives in `.env.local` as `NEXT_PUBLIC_WS_URL`
+ 
 All messages sent **to** the server must include an `"action"` field matching one of the route keys below. All messages sent **from** the server (via `post_to_connection`) follow the shape `{ "message": string, "status": "success" | "Error", ...extra fields }`.
-
+ 
 ---
 
 ## 1. `create_user`
@@ -37,7 +38,6 @@ Handles both room creation and room joining — distinguished by whether `room_i
   "is_host": true
 }
 ```
-> ⚠️ **TODO:** current implementation does not yet return `room_id`, `user_id`, or `is_host` in the success response — needs to be added before frontend can store these values. Fields shown above are the target shape.
 
 ### Response — Error (missing body)
 ```json
