@@ -3,3 +3,5 @@
 *.tfstate
 *.tfstate.*
 *.zip
+.env.local
+frontend/.env.local
