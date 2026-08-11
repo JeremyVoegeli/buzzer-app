@@ -71,11 +71,13 @@ def lambda_handler(event, context):
             for connection in items2:
                 if (connection["connection_id"] != connection_id):
                     connection_ids.append(connection["connection_id"])
+                else:
+                     winning_username = connection["username"]
 
             #send message to all connections for that room
             for c in connection_ids:
                 send_to_client({
-                    "message": f"{user_id} buzzed first",
+                    "message": f"{winning_username} buzzed first",
                     "status": "success"
                 }, c)
 
