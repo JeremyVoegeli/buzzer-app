@@ -132,17 +132,24 @@ def lambda_handler(event, context):
 
         for user in all_users:
             roster.append({"username": user["username"], "is_host": user["is_host"]})
-            all_conection_ids.append(user["connection_id"])
+            if user["user_id"] != user_id:
+                all_conection_ids.append(user["connection_id"])
 
         for c in all_conection_ids:
             send_to_client({
                 "message": "Created new user.",
                 "status": "success",
-                "user_id": user_id,
-                "room_id": room_id,
-                "is_host": is_host,
                 "roster": roster
             }, c)
+
+        send_to_client({
+                        "message": "Created new user.",
+                        "status": "success",
+                        "user_id": user_id,
+                        "room_id": room_id,
+                        "is_host": is_host,
+                        "roster": roster
+                    }, connection_id)
         return {"statusCode": 200}
     
     except (json.JSONDecodeError, KeyError): #error for invalid json format
