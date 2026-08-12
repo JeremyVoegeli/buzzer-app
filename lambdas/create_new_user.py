@@ -51,6 +51,27 @@ def lambda_handler(event, context):
         else:
             return False
 
+    #returns a list of all users in the room the new user is joining
+    def get_all_users_in_room(room_id):
+        all_users = []
+        exclusive_start_key = None
+
+        while True:
+
+            query_kwargs = {"KeyConditionExpression": Key("room_id").eq(room_id)}
+
+            if exclusive_start_key:
+                query_kwargs["ExclusiveStartKey"] = exclusive_start_key
+
+            response = table.query(**query_kwargs)
+
+            all_users.extend(response.get("Items", []))
+
+            exclusive_start_key = response.get("LastEvaluatedKey")
+            if not exclusive_start_key: break
+
+        return all_users
+
     # ---------- Actual Lambda Logic ----------
     if "body" not in event or not event["body"]: #check that request body is present
         send_to_client({
@@ -104,12 +125,17 @@ def lambda_handler(event, context):
             })
             return {"statusCode": put_item_status_code}
 
+        #create a roster of every username and is_host value in the room
+        roster = get_all_users_in_room(room_id)
+
+
         send_to_client({
             "message": "Created new user.",
             "status": "success",
             "user_id": user_id,
             "room_id": room_id,
-            "is_host": is_host
+            "is_host": is_host,
+            "roster": roster
         })
         return {"statusCode": 200}
     
