@@ -10,17 +10,25 @@ export function RoomProvider({ children }) {
   const [userId, setUserId] = useState(null);
   const [username, setUsername] = useState(null); // not returned by the backend — stored locally when submitted
   const [isHost, setIsHost] = useState(false);
+  const [participants, setParticipants] = useState([]); // [{ username, is_host }, ...] — current room roster
   const [lastMessage, setLastMessage] = useState(null);
   const [winner, setWinner] = useState(null); // username of whoever buzzed first, per round; null = no winner yet
 
   const handleMessage = useCallback((data) => {
     setLastMessage(data);
 
-    // create_user response: room_id + user_id + is_host all present together
+    // create_user response to the joiner themselves: has room_id + user_id + is_host together
     if (data.room_id !== undefined && data.user_id !== undefined && data.is_host !== undefined) {
       setRoomId(data.room_id);
       setUserId(data.user_id);
       setIsHost(Boolean(data.is_host));
+      if (data.roster) setParticipants(data.roster);
+      return;
+    }
+
+    // create_user broadcast to everyone already in the room: roster only, no identity fields
+    if (data.roster !== undefined) {
+      setParticipants(data.roster);
       return;
     }
 
@@ -70,6 +78,7 @@ export function RoomProvider({ children }) {
     setUserId(null);
     setUsername(null);
     setIsHost(false);
+    setParticipants([]);
     setWinner(null);
   }, [send]);
 
@@ -82,6 +91,7 @@ export function RoomProvider({ children }) {
     userId,
     username,
     isHost,
+    participants,
     winner,
     didIWin,
     lastMessage,
