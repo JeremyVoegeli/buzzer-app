@@ -8,6 +8,7 @@ const RoomContext = createContext(null);
 export function RoomProvider({ children }) {
   const [roomId, setRoomId] = useState(null);
   const [userId, setUserId] = useState(null);
+  const [connectionId, setConnectionId] = useState(null);
   const [username, setUsername] = useState(null); // not returned by the backend — stored locally when submitted
   const [isHost, setIsHost] = useState(false);
   const [participants, setParticipants] = useState([]); // [{ username, is_host }, ...] — current room roster
