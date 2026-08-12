@@ -31,8 +31,8 @@ def lambda_handler(event, context):
     client = boto3.client("apigatewaymanagementapi", endpoint_url=endpoint_url)
 
     #sends msg (JSON) back to client
-    def send_to_client(msg):
-        client.post_to_connection(ConnectionId=connection_id, Data=json.dumps(msg))
+    def send_to_client(msg, c_id):
+        client.post_to_connection(ConnectionId=c_id, Data=json.dumps(msg))
 
     #generates a 6-digit uppercase-only string to represent the room code
     def generate_room_id():
@@ -77,7 +77,7 @@ def lambda_handler(event, context):
         send_to_client({
             "message": "Missing request body",
             "status": "Error"
-        })
+        }, connection_id)
         return {"statusCode": 400}
 
     try:
@@ -104,7 +104,7 @@ def lambda_handler(event, context):
                 send_to_client({
                     "message": "Couldn't generate room id. Please try again later.",
                     "status": "Error"
-                })
+                }, connection_id)
                 return {"statusCode": 400}
 
         response = table.put_item(
@@ -122,29 +122,32 @@ def lambda_handler(event, context):
             send_to_client({
                 "message": "Couldn't add new user to the database",
                 "status": "Error"
-            })
+            }, connection_id)
             return {"statusCode": put_item_status_code}
 
         #create a roster of every username and is_host value in the room
         all_users = get_all_users_in_room(room_id)
         roster = []
+        all_conection_ids = []
 
         for user in all_users:
             roster.append({"username": user["username"], "is_host": user["is_host"]})
+            all_conection_ids.append(user["connection_id"])
 
-        send_to_client({
-            "message": "Created new user.",
-            "status": "success",
-            "user_id": user_id,
-            "room_id": room_id,
-            "is_host": is_host,
-            "roster": roster
-        })
+        for c in all_conection_ids:
+            send_to_client({
+                "message": "Created new user.",
+                "status": "success",
+                "user_id": user_id,
+                "room_id": room_id,
+                "is_host": is_host,
+                "roster": roster
+            }, c)
         return {"statusCode": 200}
     
     except (json.JSONDecodeError, KeyError): #error for invalid json format
         send_to_client({
             "message": "Invalid JSON format",
             "status": "Error"
-        })
+        }, connection_id)
         return {"statusCode": 400}
