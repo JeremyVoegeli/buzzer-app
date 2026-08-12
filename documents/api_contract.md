@@ -100,8 +100,8 @@ Fires automatically when a socket closes (tab closed, network drop, etc.) — sa
 ---
 
 ## 3. `buzz`
-
-### Request - Success
+ 
+### Request
 ```json
 {
   "action": "buzz",
@@ -109,22 +109,18 @@ Fires automatically when a socket closes (tab closed, network drop, etc.) — sa
   "room_id": "ABCDEF"
 }
 ```
-
-### Response — To the winner (first buzz)
+ 
+### Response — Broadcast when someone wins (sent to every open connection in the room, including the winner)
 ```json
-{ "message": "You buzzed first!", "status": "success" }
+{ "message": "Jeremy buzzed first", "status": "success" }
 ```
-
-### Response — Broadcast to other room members (when someone wins)
-```json
-{ "message": "John buzzed first", "status": "success" }
-```
-
-### Response — To a non-winning buzzer
-```json
-{ "message": "You didn't buzz first in the room.", "status": "success" }
-```
-
+> Includes the winner's `username` embedded in the message string (not a separate field) — frontend parses it by stripping the trailing `" buzzed first"`. Every client (winner included) receives the identical message; the frontend determines "did I win?" by comparing the parsed name against its own locally-stored `username`.
+ 
+### Non-winning buzz
+No message is sent to the client. The Lambda still records the buzz in `buzz_in` and returns `{"statusCode": 200}` to API Gateway, but nothing is delivered over the socket — a losing buzz is silent from the client's perspective.
+ 
+### Known behavior
+- Stale/disconnected connections encountered during broadcast (`GoneException`) are now handled without crashing the whole invocation — confirm whether stale rows also get cleaned up from `connections`, or just skipped.
 ---
 
 ## 4. `clear_buzzes`
