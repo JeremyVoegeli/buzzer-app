@@ -1,69 +1,101 @@
-import Image from "next/image";
+"use client";
 
-export default function Home() {
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useRoom } from "../context/RoomProvider";
+
+export default function HomePage() {
+  const router = useRouter();
+  const { status, roomId, createRoom, joinRoom } = useRoom();
+  const [username, setUsername] = useState("");
+  const [joinCode, setJoinCode] = useState("");
+  const [mode, setMode] = useState("create"); // "create" | "join"
+
+  const canSubmit = status === "open" && username.trim().length > 0 && (mode === "create" || joinCode.trim().length === 6);
+
+  function handleSubmit(e) {
+    e.preventDefault();
+    if (!canSubmit) return;
+    if (mode === "create") {
+      createRoom(username.trim());
+    } else {
+      joinRoom(username.trim(), joinCode.trim().toUpperCase());
+    }
+  }
+
+  // Once the backend confirms room_id, move to the game screen.
+  if (roomId) {
+    router.push("/room");
+  }
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.js
-            </code>{" "}
-            file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+    <main className="min-h-screen bg-[#121218] text-[#F4F2ED] flex flex-col items-center justify-center px-6">
+      <div className="w-full max-w-sm">
+        <h1 className="font-['Archivo_Black',_sans-serif] text-5xl tracking-tight text-center mb-2">
+          BUZZ<span className="text-[#FF4438]">IN</span>
+        </h1>
+        <p className="text-center text-[#8A8DA8] text-sm mb-10">
+          {status === "open" ? "Ready to play" : "Connecting..."}
+        </p>
+
+        <div className="flex mb-6 rounded-full bg-[#22222C] p-1">
+          <button
+            type="button"
+            onClick={() => setMode("create")}
+            className={`flex-1 py-2 rounded-full text-sm font-semibold transition-colors ${
+              mode === "create" ? "bg-[#FFB627] text-[#121218]" : "text-[#8A8DA8]"
+            }`}
           >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
+            Host a room
+          </button>
+          <button
+            type="button"
+            onClick={() => setMode("join")}
+            className={`flex-1 py-2 rounded-full text-sm font-semibold transition-colors ${
+              mode === "join" ? "bg-[#FF4438] text-[#F4F2ED]" : "text-[#8A8DA8]"
+            }`}
+          >
+            Join a room
+          </button>
+        </div>
+
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+          <div>
+            <label className="block text-xs uppercase tracking-wide text-[#8A8DA8] mb-1">
+              Your name
+            </label>
+            <input
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              placeholder="What should we call you?"
+              maxLength={24}
+              className="w-full bg-[#22222C] rounded-lg px-4 py-3 text-[#F4F2ED] placeholder-[#8A8DA8]/60 outline-none focus:ring-2 focus:ring-[#FFB627]"
             />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+          </div>
+
+          {mode === "join" && (
+            <div>
+              <label className="block text-xs uppercase tracking-wide text-[#8A8DA8] mb-1">
+                Room code
+              </label>
+              <input
+                value={joinCode}
+                onChange={(e) => setJoinCode(e.target.value.toUpperCase().slice(0, 6))}
+                placeholder="ABCDEF"
+                className="w-full bg-[#22222C] rounded-lg px-4 py-3 font-['Archivo_Black',_sans-serif] tracking-[0.3em] text-center text-2xl text-[#F4F2ED] placeholder-[#8A8DA8]/40 outline-none focus:ring-2 focus:ring-[#FF4438]"
+              />
+            </div>
+          )}
+
+          <button
+            type="submit"
+            disabled={!canSubmit}
+            className="mt-2 w-full py-4 rounded-lg font-bold text-lg bg-[#FF4438] text-[#F4F2ED] disabled:opacity-40 disabled:cursor-not-allowed transition-opacity"
           >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+            {mode === "create" ? "Create room" : "Join room"}
+          </button>
+        </form>
+      </div>
+    </main>
   );
 }
