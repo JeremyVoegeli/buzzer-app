@@ -75,6 +75,7 @@ def lambda_handler(event, context):
             query_response2 = connections_table.query(KeyConditionExpression=Key("room_id").eq(room_id))
             items2 = query_response2.get("Items", [])
 
+            winning_username = items[0]["username"]
             connection_ids = []
             for connection in items2:
                 #removes user if there is a closed connection - fallback for any stale connections left over
@@ -83,7 +84,7 @@ def lambda_handler(event, context):
                     print(f"Removed {connection["user_id"]}")
 
                 else:
-                     winning_username = connection["username"]
+                    connection_ids.append(connection["connection_id"])
 
             #send message to all connections for that room
             for c in connection_ids:
@@ -92,15 +93,7 @@ def lambda_handler(event, context):
                     "status": "success"
                 }, c)
 
-            return {"statusCode": 200}
-
-        else:
-            send_to_client({
-                "message": "You didn't buzz first in the room.",
-                "status": "success"
-            }, connection_id)
-
-            return {"statusCode": 200}
+        return {"statusCode": 200}
 
     except (json.JSONDecodeError, KeyError): #error for invalid json format
             send_to_client({
