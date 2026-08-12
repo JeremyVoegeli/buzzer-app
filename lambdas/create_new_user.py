@@ -126,8 +126,11 @@ def lambda_handler(event, context):
             return {"statusCode": put_item_status_code}
 
         #create a roster of every username and is_host value in the room
-        roster = get_all_users_in_room(room_id)
+        all_users = get_all_users_in_room(room_id)
+        roster = []
 
+        for user in all_users:
+            roster.append({"username": user["username"], "is_host": user["is_host"]})
 
         send_to_client({
             "message": "Created new user.",
