@@ -73,7 +73,9 @@ export function RoomProvider({ children }) {
   }, [send, roomId]);
 
   const leaveRoom = useCallback(() => {
-    send({ action: "leave_room" });
+    send({ 
+      action: "remove_user"
+    });
     setRoomId(null);
     setUserId(null);
     setUsername(null);
