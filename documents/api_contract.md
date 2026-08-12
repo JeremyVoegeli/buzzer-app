@@ -8,9 +8,9 @@ All messages sent **to** the server must include an `"action"` field matching on
 ---
 
 ## 1. `create_user`
-
+ 
 Handles both room creation and room joining — distinguished by whether `room_id` is present in the request.
-
+ 
 ### Request — Create a room (host)
 ```json
 {
@@ -18,7 +18,7 @@ Handles both room creation and room joining — distinguished by whether `room_i
   "username": "Jeremy"
 }
 ```
-
+ 
 ### Request — Join a room
 ```json
 {
@@ -27,38 +27,55 @@ Handles both room creation and room joining — distinguished by whether `room_i
   "room_id": "ABCDEF"
 }
 ```
-
-### Response — Success
+ 
+### Response — Success (sent to the joiner/creator themselves)
 ```json
 {
   "message": "Created new user.",
   "status": "success",
-  "room_id": "ABCDEF",
   "user_id": "a1a4dc35-c81b-4d35-8aca-0600a9f95e02",
-  "is_host": true
+  "room_id": "ABCDEF",
+  "is_host": true,
+  "roster": [
+    { "username": "Jeremy", "is_host": true },
+    { "username": "John Doe", "is_host": false }
+  ]
 }
 ```
-
+ 
+### Broadcast — sent to everyone else already in the room when a new user joins
+```json
+{
+  "message": "Created new user.",
+  "status": "success",
+  "roster": [
+    { "username": "Jeremy", "is_host": true },
+    { "username": "John Doe", "is_host": false }
+  ]
+}
+```
+> No identity fields (`room_id`/`user_id`/`is_host`) — this message is distinguished from the one above purely by their absence. Frontend replaces its whole `participants` list with `roster` on every message of either shape.
+ 
 ### Response — Error (missing body)
 ```json
 { "message": "Missing request body", "status": "Error" }
 ```
-
+ 
 ### Response — Error (invalid JSON)
 ```json
 { "message": "Invalid JSON format", "status": "Error" }
 ```
-
+ 
 ### Response — Error (room_id generation failed)
 ```json
 { "message": "Couldn't generate room id. Please try again later.", "status": "Error" }
 ```
-
+ 
 ### Response — Error (DB write failed)
 ```json
 { "message": "Couldn't add new user to the database", "status": "Error" }
 ```
-
+ 
 ---
 
 ## 2. `remove_user` (custom action, shares Lambda with `$disconnect`)
