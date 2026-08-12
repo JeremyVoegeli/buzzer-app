@@ -5,8 +5,7 @@ from boto3.dynamodb.conditions import Key
 """
 Expected Request Format:
 {
-    "action": "remove_user",
-    "connection_id: gVuFMK6MpQAYKEjXpA==
+    "action": "remove_user"
 }
 """
 
@@ -31,46 +30,29 @@ def lambda_handler(event, context):
         client.post_to_connection(ConnectionId=connection_id, Data=json.dumps(msg))
 
     # ---------- Actual Lambda Logic ----------
-    if "body" not in event or not event["body"]: #check that request body is present
-            send_to_client({
-                "message": "Missing request body",
-                "status": "Error"
-            })
-            return {"statusCode": 400}
-    try:
-        #retrieve connection_id from request
-        body = json.loads(event["body"])
-        connection_id_to_remove = body["connection_id"]
+    
+    #query for room_id of user
+    query_response = table.query(IndexName="index_by_connection_id", KeyConditionExpression=Key("connection_id").eq(connection_id))
+    items = query_response.get("Items", [])
 
-        #query for room_id of user
-        query_response = table.query(IndexName="index_by_connection_id", KeyConditionExpression=Key("connection_id").eq(connection_id_to_remove))
-        items = query_response.get("Items", [])
-
-        #check that user exists in db
-        if not items:
-            send_to_client({
-                "message": "User isn't currently in database",
-                "status": "Error"
-            })
-            return {"statusCode": 404}
-
-        #delete the user from the db based on their room_id
-        for item in items:
-            room_id = item["room_id"]
-            table.delete_item(Key={
-                "room_id": room_id,
-                "connection_id": connection_id_to_remove
-            })
-
+    #check that user exists in db
+    if not items:
         send_to_client({
-            "message": f"removed user: {items}",
-            "status": "success"
+            "message": "User isn't currently in database",
+            "status": "Error"
         })
-        return {"statusCode": 200}
+        return {"statusCode": 404}
 
-    except (json.JSONDecodeError, KeyError): #error for invalid json format
-            send_to_client({
-                "message": "Invalid JSON format",
-                "status": "Error"
-            })
-            return {"statusCode": 400}
+    #delete the user from the db based on their room_id
+    for item in items:
+        room_id = item["room_id"]
+        table.delete_item(Key={
+            "room_id": room_id,
+            "connection_id": connection_id
+        })
+
+    send_to_client({
+        "message": f"removed user: {items}",
+        "status": "success"
+    })
+    return {"statusCode": 200}
