@@ -82,9 +82,6 @@ def lambda_handler(event, context):
                     response = connections_table.delete_item(Key={"room_id": room_id, "connection_id": connection["connection_id"]})
                     print(f"Removed {connection["user_id"]}")
 
-                elif (connection["connection_id"] != connection_id):
-                    connection_ids.append(connection["connection_id"])
-
                 else:
                      winning_username = connection["username"]
 
@@ -94,11 +91,6 @@ def lambda_handler(event, context):
                     "message": f"{winning_username} buzzed first",
                     "status": "success"
                 }, c)
-
-            send_to_client({
-                "message": "You buzzed first in the room.",
-                "status": "success"
-            }, connection_id)
 
             return {"statusCode": 200}
 
