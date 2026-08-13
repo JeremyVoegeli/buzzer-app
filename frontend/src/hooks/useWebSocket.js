@@ -6,9 +6,6 @@ export function useWebSocket(url, onMessage) {
   const [status, setStatus] = useState("connecting"); // "connecting" | "open" | "closed"
   const wsRef = useRef(null);
 
-  // Keep the latest onMessage in a ref so the socket's event listener
-  // always calls the newest version, without needing to reconnect
-  // every time a parent component re-renders with a new callback.
   const onMessageRef = useRef(onMessage);
   useEffect(() => {
     onMessageRef.current = onMessage;
@@ -20,7 +17,11 @@ export function useWebSocket(url, onMessage) {
 
     ws.onopen = () => setStatus("open");
     ws.onclose = () => setStatus("closed");
-    ws.onerror = (err) => console.error("WebSocket error:", err);
+    ws.onerror = (err) => {
+      if (wsRef.current === ws){ //avoids strict-mode only error when launching site
+        console.error("Websocket error: ", err)
+      }
+    }
 
     ws.onmessage = (event) => {
       try {
