@@ -34,8 +34,18 @@ data "aws_iam_policy_document" "api_buzz_permissions" {
     statement {
         effect = "Allow"
         actions = "execute-api:ManageConnections"
-        resources = "${aws_apigatewayv2_api.websocket_api.execution_arn}/prod/GET/@connections/*"
+        resources = "${aws_apigatewayv2_api.websocket_api.execution_arn}/${aws_apigatewayv2_api.websocket_api.websocket_api_stage.name}/GET/@connections/*"
     }
+}
+
+resource "aws_iam_role_policy" "buzz_api_policy" {
+    name = "api_call_policies"
+    policy = data.aws_iam_policy_document.api_buzz_permissions.json
+}
+
+resource "aws_iam_role_policy_attachment" "buzz_api_policy_attachment" {
+    role = aws_iam_role.buzz_role.name
+    policy_arn = aws_iam_policy.buzz_api_policy.arn
 }
 
 # ---------- CloudWatch Logging Policy ----------
