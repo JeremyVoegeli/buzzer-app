@@ -75,9 +75,15 @@ def lambda_handler(event, context):
             query_response2 = connections_table.query(KeyConditionExpression=Key("room_id").eq(room_id))
             items2 = query_response2.get("Items", [])
 
-            winning_username = items2[0]["username"]
+            #holds the username of the winning user
+            winning_username = ""
+
             connection_ids = []
             for connection in items2:
+                #checks for username of winning user
+                if connection["user_id"] == user_id:
+                     winning_username = connection["username"]
+
                 #removes user if there is a closed connection - fallback for any stale connections left over
                 if not is_connection_open(connection["connection_id"]):
                     response = connections_table.delete_item(Key={"room_id": room_id, "connection_id": connection["connection_id"]})
