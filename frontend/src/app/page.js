@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useRoom } from "../context/RoomProvider";
 
@@ -24,10 +24,12 @@ export default function HomePage() {
   }
 
   // Once the backend confirms room_id, move to the game screen.
-  if (roomId) {
+  useEffect(() => {
+    if (roomId) {
     router.push("/room");
   }
-
+  }, [roomId, router])
+  
   return (
     <main className="min-h-screen bg-[#121218] text-[#F4F2ED] flex flex-col items-center justify-center px-6">
       <div className="w-full max-w-sm">
