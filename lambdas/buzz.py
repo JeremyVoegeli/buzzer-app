@@ -75,7 +75,7 @@ def lambda_handler(event, context):
             query_response2 = connections_table.query(KeyConditionExpression=Key("room_id").eq(room_id))
             items2 = query_response2.get("Items", [])
 
-            winning_username = items[0]["username"]
+            winning_username = items2[0]["username"]
             connection_ids = []
             for connection in items2:
                 #removes user if there is a closed connection - fallback for any stale connections left over
@@ -95,9 +95,10 @@ def lambda_handler(event, context):
 
         return {"statusCode": 200}
 
-    except (json.JSONDecodeError, KeyError): #error for invalid json format
+    except (json.JSONDecodeError, KeyError) as err: #error for invalid json format
             send_to_client({
                 "message": "Invalid JSON format",
                 "status": "Error"
             }, connection_id)
+            print(f"Got this error: {err}")
             return {"statusCode": 400}
