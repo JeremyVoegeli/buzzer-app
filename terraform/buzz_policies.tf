@@ -33,12 +33,12 @@ resource "aws_iam_role_policy_attachment" "buzz_dynamodb_policy_attachment" {
 data "aws_iam_policy_document" "api_buzz_permissions" {
     statement {
         effect = "Allow"
-        actions = "execute-api:ManageConnections"
-        resources = "${aws_apigatewayv2_api.websocket_api.execution_arn}/${aws_apigatewayv2_api.websocket_api.websocket_api_stage.name}/GET/@connections/*"
+        actions = ["execute-api:ManageConnections"]
+        resources = ["${aws_apigatewayv2_api.websocket_api.execution_arn}/prod/GET/@connections/*"]
     }
 }
 
-resource "aws_iam_role_policy" "buzz_api_policy" {
+resource "aws_iam_policy" "buzz_api_policy" {
     name = "api_call_policies"
     policy = data.aws_iam_policy_document.api_buzz_permissions.json
 }
