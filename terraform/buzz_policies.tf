@@ -29,7 +29,16 @@ resource "aws_iam_role_policy_attachment" "buzz_dynamodb_policy_attachment" {
     policy_arn = aws_iam_policy.buzz_dynamodb_policy.arn
 }
 
-# ----------CloudWatch Logging Policy ----------
+# ---------- API Call Permissions ----------
+data "aws_iam_policy_document" "api_buzz_permissions" {
+    statement {
+        effect = "Allow"
+        actions = "execute-api:ManageConnections"
+        resources = "${aws_apigatewayv2_api.websocket_api.execution_arn}/prod/GET/@connections/*"
+    }
+}
+
+# ---------- CloudWatch Logging Policy ----------
 resource "aws_iam_role_policy_attachment" "attach_logging_policy_to_buzz" {
     role = aws_iam_role.buzz_role.name
     policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
