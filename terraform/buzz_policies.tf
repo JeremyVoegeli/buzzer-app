@@ -14,13 +14,7 @@ data "aws_iam_policy_document" "dynamodb_buzz_permissions" {
 
     statement {
         effect = "Allow"
-        actions = ["dynamodb:Query"]
-        resources = [aws_dynamodb_table.connected_users.arn]
-    }
-
-    statement {
-        effect = "Allow"
-        actions = ["dynamodb:DeleteItem"]
+        actions = ["dynamodb:Query", "dynamodb:DeleteItem"]
         resources = [aws_dynamodb_table.connected_users.arn]
     }
 }
