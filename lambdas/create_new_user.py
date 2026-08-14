@@ -1,6 +1,7 @@
 import json
 import uuid
 import random
+import time
 import string
 import boto3
 from boto3.dynamodb.conditions import Key
@@ -113,7 +114,8 @@ def lambda_handler(event, context):
                 "connection_id": connection_id,
                 "username": username,
                 "user_id": user_id,
-                "is_host": is_host
+                "is_host": is_host,
+                "expires_at": int(time.time()) + 7200
             }
         )
 
