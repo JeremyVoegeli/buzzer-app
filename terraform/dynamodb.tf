@@ -36,4 +36,9 @@ resource "aws_dynamodb_table" "connected_users" {
         hash_key = "connection_id"
         projection_type = "ALL"
     }
+
+    ttl {
+        attribute_name = "expires_at"
+        enabled = true
+    }
 }
