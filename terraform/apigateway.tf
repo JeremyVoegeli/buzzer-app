@@ -11,7 +11,8 @@ resource "aws_apigatewayv2_deployment" "websocket_api_deployment" {
             aws_apigatewayv2_route.create_user_route.id,
             aws_apigatewayv2_route.remove_user_route.id,
             aws_apigatewayv2_route.clear_buzzes_route.id,
-            aws_apigatewayv2_route.buzz_route.id
+            aws_apigatewayv2_route.buzz_route.id,
+            aws_apigatewayv2_route.rejoin_room_route.id
         ])
     }
     lifecycle {

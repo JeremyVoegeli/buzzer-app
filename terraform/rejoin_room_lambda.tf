@@ -1,6 +1,6 @@
 #creates a zip archive of the code
 data "archive_file" "rejoin_room_zip" {
-    tipe = "zip"
+    type = "zip"
     source_file = "../lambdas/rejoin_room.py"
     output_path = "../zip_archive/rejoin_room.zip"
 }
@@ -8,7 +8,7 @@ data "archive_file" "rejoin_room_zip" {
 #creates actual lambda function
 resource "aws_lambda_function" "rejoin_room_lambda" {
     filename = data.archive_file.rejoin_room_zip.output_path
-    source_code_hash =cdata.archive_file.rejoin_room_zip.output_base64sha256
+    source_code_hash = data.archive_file.rejoin_room_zip.output_base64sha256
     function_name = "rejoin_room"
     role = aws_iam_role.rejoin_room_role.arn
     runtime = "python3.13"
@@ -17,9 +17,9 @@ resource "aws_lambda_function" "rejoin_room_lambda" {
 
 #determines who is allowed to invoke the lambda
 resource "aws_lambda_permission" "rejoin_room_invoke_permissions" {
-    statement_it = "AllowAPIGatewayInvoke"
+    statement_id = "AllowAPIGatewayInvoke"
     action = "lambda:InvokeFunction"
-    function_name = aws_lambda_function.rejoin_room.function_name
+    function_name = aws_lambda_function.rejoin_room_lambda.function_name
     principal = "apigateway.amazonaws.com"
     source_arn = "${aws_apigatewayv2_api.websocket_api.execution_arn}/*"
 }
