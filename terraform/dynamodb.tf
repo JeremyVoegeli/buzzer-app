@@ -13,6 +13,11 @@ resource "aws_dynamodb_table" "buzz_in" {
         name = "buzz_time"
         type = "S"
     }
+
+    ttl {
+        attribute_name = "expires_at"
+        enabled = true
+    }
 }
 
 resource "aws_dynamodb_table" "connected_users" {

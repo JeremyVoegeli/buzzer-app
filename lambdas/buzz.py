@@ -1,5 +1,6 @@
 import json
 import boto3
+import time
 from boto3.dynamodb.conditions import Key
 from datetime import datetime, timezone
 
@@ -58,7 +59,8 @@ def lambda_handler(event, context):
             Item = {
                 "room_id": room_id,
                 "user_id": user_id,
-                "buzz_time": buzz_time
+                "buzz_time": buzz_time,
+                "expires_at": int(time.time()) + 3600
             }
         )
 

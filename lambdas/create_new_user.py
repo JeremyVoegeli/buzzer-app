@@ -115,7 +115,7 @@ def lambda_handler(event, context):
                 "username": username,
                 "user_id": user_id,
                 "is_host": is_host,
-                "expires_at": int(time.time()) + 7200
+                "expires_at": int(time.time()) + 21600
             }
         )
 
