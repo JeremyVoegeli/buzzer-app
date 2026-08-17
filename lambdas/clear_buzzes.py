@@ -90,7 +90,8 @@ def lambda_handler(event, context):
                 "message": f"Successfully cleared all buzzes for room {room_id}.",
                 "status": "success"
             }, c)
-            return {"statusCode": 200}
+
+        return {"statusCode": 200}
 
     except (json.JSONDecodeError, KeyError): #error for invalid json format
             send_to_client({
