@@ -83,13 +83,11 @@ export function RoomProvider({ children }) {
   }, [status, roomId, send, clearSession]);
 
   const createRoom = useCallback((name) => {
-    usernameRef.current = name;
     setUsername(name);
     send({ action: "create_user", username: name });
   }, [send]);
 
   const joinRoom = useCallback((name, joinRoomId) => {
-    usernameRef.current = name;
     setUsername(name);
     send({ action: "create_user", username: name, room_id: joinRoomId });
   }, [send]);
