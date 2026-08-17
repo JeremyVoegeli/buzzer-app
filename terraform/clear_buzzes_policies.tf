@@ -39,7 +39,7 @@ data "aws_iam_policy_document" "api_clear_buzzes_permissions" {
 }
 
 resource "aws_iam_policy" "clear_buzzes_api_policy" {
-    name = "api_call_policies"
+    name = "clear_buzzes_api_call_policies"
     policy = data.aws_iam_policy_document.api_clear_buzzes_permissions.json
 }
 
