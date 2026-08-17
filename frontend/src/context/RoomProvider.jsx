@@ -55,6 +55,11 @@ export function RoomProvider({ children }) {
       return;
     }
 
+    if (data.message.includes("Successfully cleared all buzzes for room")) {
+    setWinner(null);
+    return;
+  }
+
     if (typeof data.message === "string" && data.message.endsWith(" buzzed first")) {
       setWinner(data.message.replace(" buzzed first", ""));
       return;
@@ -100,7 +105,6 @@ export function RoomProvider({ children }) {
   const clearBuzzes = useCallback(() => {
     if (!roomId) return;
     send({ action: "clear_buzzes", room_id: roomId });
-    setWinner(null);
   }, [send, roomId]);
 
   const leaveRoom = useCallback(() => {
