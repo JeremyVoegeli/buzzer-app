@@ -20,7 +20,7 @@ resource "aws_iam_policy" "rejoin_room_dynamodb_policy" {
 
 resource "aws_iam_role_policy_attachment" "dynamodb_rejoin_room_policy_attachment" {
     role = aws_iam_role.rejoin_room_role.name
-    policy_arn = aws_iam_policy.dynamodb_write_policy.arn
+    policy_arn = aws_iam_policy.rejoin_room_dynamodb_policy.arn
 }
 
 # ---------- CloudWatch Logging Policy ----------
